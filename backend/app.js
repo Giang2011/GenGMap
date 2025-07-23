@@ -219,11 +219,13 @@ async function generateItineraryWithAI(destinations, province, days) {
 }
 
 // 4. Kết nối tới cơ sở dữ liệu MySQL
-// NHỚ THAY THẾ BẰNG THÔNG TIN CỦA BẠN
-const sequelize = new Sequelize('my_express_app', 'root', '', {
-  host: 'localhost',
-  dialect: 'mysql'
-});
+const dbUri = process.env.DB_URI;
+const sequelize = dbUri
+  ? new Sequelize(dbUri)
+  : new Sequelize('my_express_app', 'root', '', {
+      host: 'localhost',
+      dialect: 'mysql'
+    });
 
 // 5. Định nghĩa các Models (Models tương ứng với các bảng trong CSDL)
 
@@ -254,6 +256,8 @@ const Destination = sequelize.define('Destination', {
   image_url: {
     type: DataTypes.STRING
   }
+}, {
+  tableName: 'destinations'
 });
 
 // Bảng Itineraries (Lộ trình)
@@ -268,6 +272,7 @@ const Itinerary = sequelize.define('Itinerary', {
     allowNull: false
   }
 }, {
+  tableName: 'itineraries',
   timestamps: true, // Tự động thêm createdAt và updatedAt
   createdAt: 'created_at',
   updatedAt: false // Chỉ cần created_at
