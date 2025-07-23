@@ -554,6 +554,103 @@ app.post('/api/generate-itinerary', async (req, res) => {
     }
 });
 
+// API để cập nhật lộ trình (Xóa và Ghi lại)
+app.put('/api/itineraries/:shareableId', async (req, res) => {
+    try {
+        const { shareableId } = req.params;
+        const { items } = req.body;
+
+        // Kiểm tra dữ liệu đầu vào
+        if (!items || !Array.isArray(items)) {
+            return res.status(400).json({ 
+                error: 'Vui lòng cung cấp mảng items để cập nhật' 
+            });
+        }
+
+        console.log(`🔄 Đang cập nhật lộ trình: ${shareableId}`);
+        console.log(`📊 Số lượng items mới: ${items.length}`);
+
+        // Kiểm tra xem lộ trình có tồn tại không
+        const existingItinerary = await Itinerary.findOne({
+            where: { shareable_id: shareableId }
+        });
+
+        if (!existingItinerary) {
+            return res.status(404).json({ 
+                error: 'Không tìm thấy lộ trình với ID này' 
+            });
+        }
+
+        // Validate dữ liệu items
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            if (!item.destination_id || !item.day_number || !item.order_in_day) {
+                return res.status(400).json({ 
+                    error: `Item thứ ${i + 1} thiếu thông tin bắt buộc (destination_id, day_number, order_in_day)` 
+                });
+            }
+
+            // Kiểm tra destination có tồn tại không
+            const destinationExists = await Destination.findByPk(item.destination_id);
+            if (!destinationExists) {
+                return res.status(400).json({ 
+                    error: `Destination với ID ${item.destination_id} không tồn tại` 
+                });
+            }
+        }
+
+        // Sử dụng database transaction để đảm bảo an toàn dữ liệu
+        const result = await sequelize.transaction(async (transaction) => {
+            // Bước 1: Xóa tất cả itinerary_items cũ
+            console.log('🗑️ Đang xóa các items cũ...');
+            await ItineraryItem.destroy({
+                where: { itinerary_id: existingItinerary.id },
+                transaction
+            });
+
+            // Bước 2: Thêm lại các items mới
+            console.log('➕ Đang thêm các items mới...');
+            const newItems = items.map(item => ({
+                itinerary_id: existingItinerary.id,
+                destination_id: item.destination_id,
+                day_number: item.day_number,
+                order_in_day: item.order_in_day
+            }));
+
+            await ItineraryItem.bulkCreate(newItems, { transaction });
+
+            // Bước 3: Lấy lại lộ trình đã cập nhật với đầy đủ thông tin
+            const updatedItinerary = await Itinerary.findOne({
+                where: { id: existingItinerary.id },
+                include: [{
+                    model: ItineraryItem,
+                    include: [Destination],
+                    order: [['day_number', 'ASC'], ['order_in_day', 'ASC']]
+                }],
+                transaction
+            });
+
+            return updatedItinerary;
+        });
+
+        console.log('✅ Cập nhật lộ trình thành công');
+
+        res.json({
+            message: 'Cập nhật lộ trình thành công!',
+            status: 'success',
+            itinerary: result,
+            updated_items_count: items.length
+        });
+
+    } catch (error) {
+        console.error('❌ Lỗi khi cập nhật lộ trình:', error);
+        res.status(500).json({ 
+            error: 'Đã có lỗi xảy ra khi cập nhật lộ trình',
+            details: error.message 
+        });
+    }
+});
+
 // API để thêm dữ liệu mẫu (dùng để test)
 app.post('/api/seed-data', async (req, res) => {
     try {
