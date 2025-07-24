@@ -6,6 +6,35 @@
 - **GET** `/api/destinations`
 - Trả về danh sách các địa điểm du lịch.
 
+#### Ví dụ kết quả trả về
+```json
+[
+  {
+    "id": 10,
+    "name": "Quán ăn ABC",
+    "category": "am-thuc",
+    "description": "Quán ăn nổi tiếng với các món đặc sản.",
+    "address": "123 Đường ABC, Nha Trang",
+    "city": "Nha Trang",
+    "latitude": 12.25,
+    "longitude": 109.18,
+    "image_url": "https://example.com/image.jpg"
+  },
+  {
+    "id": 11,
+    "name": "Bãi biển XYZ",
+    "category": "bien",
+    "description": "Bãi biển đẹp, nước trong xanh.",
+    "address": "Bãi biển XYZ, Nha Trang",
+    "city": "Nha Trang",
+    "latitude": 12.26,
+    "longitude": 109.19,
+    "image_url": "https://example.com/beach.jpg"
+  }
+  // Các địa điểm khác
+]
+```
+
 ### 2. Tạo lộ trình du lịch thông minh
 - **POST** `/api/generate-itinerary`
 - Body (JSON):
@@ -16,23 +45,6 @@
   }
   ```
 - Trả về lộ trình du lịch, danh sách các địa điểm theo từng ngày.
-
-#### Ví dụ gọi API bằng JavaScript (frontend)
-```javascript
-fetch('http://localhost:3000/api/generate-itinerary', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ province: 'Nha Trang', days: 3 })
-})
-.then(res => res.json())
-.then(data => {
-  console.log('Kết quả trả về:', data);
-  // Xử lý dữ liệu lộ trình ở đây
-})
-.catch(err => {
-  console.error('Lỗi:', err);
-});
-```
 
 #### Ví dụ kết quả trả về
 ```json
