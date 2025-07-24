@@ -16,6 +16,33 @@
   }
   ```
 - Trả về lộ trình du lịch, danh sách các địa điểm theo từng ngày.
+- Ví dụ
+- Body(JSON):
+  ```json
+  {
+  "message": "Tạo lộ trình thành công!",
+  "status": "success",
+  "itinerary": {
+    "id": 1,
+    "shareable_id": "nha-trang-3d-1721820000000",
+    "title": "Khám phá Nha Trang 3 ngày",
+    "created_at": "2025-07-24T10:00:00.000Z",
+    "ItineraryItems": [
+      {
+        "day_number": 1,
+        "order_in_day": 1,
+        "Destination": {
+          "name": "Quán ăn ABC",
+          "category": "am-thuc",
+          // ...
+        }
+      }
+      // ...
+    ]
+  },
+  "shareableUrl": "/itinerary/nha-trang-3d-1721820000000"
+  }
+```
 
 ### 3. Lấy tất cả lộ trình đã tạo
 - **GET** `/api/itineraries`
