@@ -1,17 +1,19 @@
 // 1. Nạp (import) các thư viện cần thiết
 const express = require('express');
+const cors = require('cors');
 const { Sequelize, DataTypes, Op } = require('sequelize');
 const axios = require('axios');
 require('dotenv').config();
 
 // 2. Tạo một ứng dụng express
 const app = express();
+app.use(cors());
 
 // Middleware để xử lý JSON
 app.use(express.json());
 
 // 3. Xác định cổng mà máy chủ sẽ lắng nghe
-const port = 3000;
+const port = 4000;
 
 // ================= SEQUELIZE SETUP (Phiên bản MySQL) =================
 
