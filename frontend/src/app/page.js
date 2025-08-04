@@ -2,87 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Select from 'react-select';
-
-const provinces = [
-  { value: "An Giang", label: "An Giang" },
-  { value: "Bà Rịa - Vũng Tàu", label: "Bà Rịa - Vũng Tàu" },
-  { value: "Bắc Giang", label: "Bắc Giang" },
-  { value: "Bắc Kạn", label: "Bắc Kạn" },
-  { value: "Bạc Liêu", label: "Bạc Liêu" },
-  { value: "Bắc Ninh", label: "Bắc Ninh" },
-  { value: "Bến Tre", label: "Bến Tre" },
-  { value: "Bình Định", label: "Bình Định" },
-  { value: "Bình Dương", label: "Bình Dương" },
-  { value: "Bình Phước", label: "Bình Phước" },
-  { value: "Bình Thuận", label: "Bình Thuận" },
-  { value: "Cà Mau", label: "Cà Mau" },
-  { value: "Cần Thơ", label: "Cần Thơ" },
-  { value: "Cao Bằng", label: "Cao Bằng" },
-  { value: "Đà Nẵng", label: "Đà Nẵng" },
-  { value: "Đắk Lắk", label: "Đắk Lắk" },
-  { value: "Đắk Nông", label: "Đắk Nông" },
-  { value: "Điện Biên", label: "Điện Biên" },
-  { value: "Đồng Nai", label: "Đồng Nai" },
-  { value: "Đồng Tháp", label: "Đồng Tháp" },
-  { value: "Gia Lai", label: "Gia Lai" },
-  { value: "Hà Giang", label: "Hà Giang" },
-  { value: "Hà Nam", label: "Hà Nam" },
-  { value: "Hà Nội", label: "Hà Nội" },
-  { value: "Hà Tĩnh", label: "Hà Tĩnh" },
-  { value: "Hải Dương", label: "Hải Dương" },
-  { value: "Hải Phòng", label: "Hải Phòng" },
-  { value: "Hậu Giang", label: "Hậu Giang" },
-  { value: "Hòa Bình", label: "Hòa Bình" },
-  { value: "Hưng Yên", label: "Hưng Yên" },
-  { value: "Khánh Hòa", label: "Khánh Hòa" },
-  { value: "Kiên Giang", label: "Kiên Giang" },
-  { value: "Kon Tum", label: "Kon Tum" },
-  { value: "Lai Châu", label: "Lai Châu" },
-  { value: "Lâm Đồng", label: "Lâm Đồng" },
-  { value: "Lạng Sơn", label: "Lạng Sơn" },
-  { value: "Lào Cai", label: "Lào Cai" },
-  { value: "Long An", label: "Long An" },
-  { value: "Nam Định", label: "Nam Định" },
-  { value: "Nghệ An", label: "Nghệ An" },
-  { value: "Ninh Bình", label: "Ninh Bình" },
-  { value: "Ninh Thuận", label: "Ninh Thuận" },
-  { value: "Phú Thọ", label: "Phú Thọ" },
-  { value: "Phú Yên", label: "Phú Yên" },
-  { value: "Quảng Bình", label: "Quảng Bình" },
-  { value: "Quảng Nam", label: "Quảng Nam" },
-  { value: "Quảng Ngãi", label: "Quảng Ngãi" },
-  { value: "Quảng Ninh", label: "Quảng Ninh" },
-  { value: "Quảng Trị", label: "Quảng Trị" },
-  { value: "Sóc Trăng", label: "Sóc Trăng" },
-  { value: "Sơn La", label: "Sơn La" },
-  { value: "Tây Ninh", label: "Tây Ninh" },
-  { value: "Thái Bình", label: "Thái Bình" },
-  { value: "Thái Nguyên", label: "Thái Nguyên" },
-  { value: "Thanh Hóa", label: "Thanh Hóa" },
-  { value: "Thừa Thiên Huế", label: "Thừa Thiên Huế" },
-  { value: "Tiền Giang", label: "Tiền Giang" },
-  { value: "TP. Hồ Chí Minh", label: "TP. Hồ Chí Minh" },
-  { value: "Trà Vinh", label: "Trà Vinh" },
-  { value: "Tuyên Quang", label: "Tuyên Quang" },
-  { value: "Vĩnh Long", label: "Vĩnh Long" },
-  { value: "Vĩnh Phúc", label: "Vĩnh Phúc" },
-  { value: "Yên Bái", label: "Yên Bái" },
-];
-
-
-const days = [
-  { value: 1, label: '1 ngày' },
-  { value: 2, label: '2 ngày' },
-  { value: 3, label: '3 ngày' },
-  { value: 4, label: '4 ngày' },
-];
 
 export default function HomePage() {
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
-  const [selectedProvince, setSelectedProvince] = useState(null);
-  const [selectedDays, setSelectedDays] = useState(null);
+  const [selectedProvince, setSelectedProvince] = useState('');
+  const [selectedDays, setSelectedDays] = useState('');
 
   useEffect(() => {
     setMounted(true);
@@ -101,7 +26,6 @@ export default function HomePage() {
       return;
     }
 
-
     try {
       const response = await fetch("http://localhost:4000/api/generate-itinerary", {
         method: "POST",
@@ -109,8 +33,8 @@ export default function HomePage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          province: selectedProvince.value,
-          days: selectedDays.value,
+          province: selectedProvince,
+          days: parseInt(selectedDays),
         }),
       });
 
@@ -130,33 +54,51 @@ export default function HomePage() {
 
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-4 gap-4 bg-black">
-      <h1 className="text-3xl font-bold">Tạo lộ trình du lịch</h1>
+    <main className="min-h-screen flex flex-col items-center justify-center p-4 gap-4 bg-gradient-to-br from-indigo-50 to-purple-100">
+      <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
+        <h1 className="text-3xl font-bold text-center mb-8 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+          🗺️ Tạo lộ trình du lịch
+        </h1>
 
-      <div className="w-full max-w-md">
-        <label className="block mb-1">Chọn tỉnh/thành phố</label>
-        <Select
-          options={provinces}
-          onChange={setSelectedProvince}
-          placeholder="Chọn tỉnh..."
-        />
+        <div className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-900 mb-2">
+              📍 Tỉnh/Thành phố
+            </label>
+            <input
+              type="text"
+              value={selectedProvince}
+              onChange={(e) => setSelectedProvince(e.target.value)}
+              placeholder="Nhập tên tỉnh/thành phố (vd: Hà Nội, TP. Hồ Chí Minh...)"
+              className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 text-black"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-900 mb-2">
+              📅 Số ngày du lịch
+            </label>
+            <select
+              value={selectedDays}
+              onChange={(e) => setSelectedDays(e.target.value)}
+              className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 text-black"
+            >
+              <option value="">Chọn số ngày...</option>
+              <option value="1">1 ngày</option>
+              <option value="2">2 ngày</option>
+              <option value="3">3 ngày</option>
+              <option value="4">4 ngày</option>
+            </select>
+          </div>
+
+          <button
+            className="w-full mt-8 px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-lg hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
+            onClick={handleSubmit}
+          >
+            ✨ Tạo lộ trình ngay
+          </button>
+        </div>
       </div>
-
-      <div className="w-full max-w-md">
-        <label className="block mb-1 mt-4">Chọn số ngày</label>
-        <Select
-          options={days}
-          onChange={setSelectedDays}
-          placeholder="Chọn số ngày..."
-        />
-      </div>
-
-      <button
-        className="mt-6 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-        onClick={handleSubmit}
-      >
-        Tạo lộ trình
-      </button>
     </main>
   );
 }
